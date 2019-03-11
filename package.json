@@ -1,0 +1,7 @@
+{
+  "name": "zsh-yarn-autocompletion",
+  "version": "0.0.0",
+  "main": "index.js",
+  "author": "Andrey Osijuk <a.osijuk@gmail.com>",
+  "license": "MIT"
+}
