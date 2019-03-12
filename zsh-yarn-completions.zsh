@@ -1,34 +1,19 @@
 _yarn_recursively_look_for() {
+  local dir
   local filename="$1"
-  local workspace="$2" # if there are workspace use this instead dir
-  local dir=$PWD
+  local workspace_path="$2"
+
+  if [[ -z $workspace_path ]]; then
+    dir="$PWD"
+  elif [[ -n $workspace_path ]]; then
+    dir="$PWD/$workspace_path"
+  fi
+
   while [ ! -e "$dir/$filename" ]; do
     dir=${dir%/*}
     [[ "$dir" = "" ]] && break
   done
   [[ ! "$dir" = "" ]] && echo "$dir/$filename"
-}
-
-_yarn_get_workspaces() { # add condition if pwd is not yarn workspace
-  local -a workspaces
-
-  for workspace in $(
-    yarn workspaces info |
-    sed '1d;$d' |
-    jq keys |
-    jq -r '.[]'
-  ); do
-    workspaces+=($workspace)
-  done
-
-  # locations=$(
-  #   yarn workspaces info |
-  #   sed '1d;$d' |
-  #   jq -c '.[].location'
-  # )
-
-  _describe -t workspace-names 'workspaces names' workspaces
-  #echo $PWD/$locations[1]/package.json
 }
 
 _yarn_get_package_json_property_object() {
@@ -74,6 +59,20 @@ _yarn_get_scripts_from_package_json() {
   _describe -t package-scripts 'package scripts' options
 }
 
+_yarn_get_scripts_from_workspace_package_json() {
+  package_json="$(_yarn_recursively_look_for package.json $location)"
+
+  [[ "$package_json" = "" ]] && return
+
+  local -a options
+  options=(
+    ${(f)"$(_yarn_parse_package_json_for_script_suggestions $package_json)"} \
+    env:'Prints list of environment variables available to the scripts at runtime' \
+  )
+
+  _describe -t package-scripts 'package scripts' options
+}
+
 _yarn_get_packages_from_package_json() {
   local package_json="$(_yarn_recursively_look_for package.json)"
 
@@ -89,9 +88,45 @@ _yarn_get_cached_packages() { # todo: find faster method to get cached packages
   sed '1d;2d;$d'
 }
 
+_yarn_get_workspaces() { # add condition if pwd is not yarn workspace
+  local -a workspaces
+
+  for workspace in $(
+    yarn workspaces info |
+    sed '1d;$d' |
+    jq keys |
+    jq -r '.[]'
+  ); do
+    workspaces+=($workspace)
+  done
+
+  _describe -t workspace-names 'workspaces names' workspaces
+}
+
 _yarn_workspace_commands() {
-  echo words $words
-  echo state: $state
+  local location workspace_name package_json 
+
+  case $words[3] in
+      *)
+        [[ $CURRENT == 4 ]] && return # add completions to commands
+      ;;
+  esac
+
+  workspace_name="$1"
+
+  location="$(
+    yarn workspaces info |
+    grep $workspace_name -A 1 |
+    sed '1d' |
+    sed '/"location": "/ s///g' |
+    sed '/",/ s///g' |
+    tr -d '[:space:]'
+  )"
+
+  _alternative \
+    'global-commands:global:_yarn_global_commands' \
+    'common-workspace-commands:workspace:_yarn_common_workspace_commands' \
+    'package-scripts:scripts:_yarn_get_scripts_from_workspace_package_json' \
 }
 
 _yarn_common_flags() {
@@ -178,6 +213,36 @@ _yarn_global_strictly_commands() {
   )
 
   _describe -t global-strictly-commands 'global strictly commands' list
+}
+
+_yarn_common_workspace_commands() {
+  local -a list
+
+  list=(
+    audit:'Perform a vulnerability audit against the installed packages.'
+    autoclean:'Cleans and removes unnecessary files from package dependencies.'
+    check:'Verifies that versions of the package dependencies in the current project’s package.json match those in yarn’s lock file.'
+    generate-lock-entry:'Generates a lock file entry.'
+    help:'Displays help information.'
+    init:'Interactively creates or updates a package.json file.'
+    install:'Install all dependencies for a project.'
+    licenses:'List licenses for installed packages.'
+    link:'Symlink a package folder during development.'
+    outdated:'Checks for outdated package dependencies.'
+    owner:'Manage package owners.'
+    pack:'Creates a compressed gzip archive of package dependencies.'
+    publish:'Publishes a package to the npm registry.'
+    run:'Runs a defined package script.'
+    tag:'Add, remove, or list tags on a package.'
+    team:'Maintain team memberships.'
+    unlink:'Unlink a previously created symlink for a package.'
+    unplug:'Temporarily copies a package (with an optional @range suffix) outside of the global cache for debugging purposes.'
+    version:'Updates the package version.'
+    versions:'Displays version information of the currently installed Yarn, Node.js, and its dependencies.'
+    why:'Show information about why a package is installed.'
+  )
+
+  _describe -t common-workspace-commands 'common workspace commands' list
 }
 
 _yarn_common_commands() {
@@ -288,8 +353,6 @@ _yarn_completion() {
   # echo arg: $0, $1, $2, $3
   # echo words: $words $words[1]
   # echo opt_args: $opt_args
-  # echo _ret $_ret
-  # echo _default $_default
   # echo service $service
   # echo CURRENT $CURRENT
   # echo last word: $words[-1]
@@ -338,8 +401,8 @@ _yarn_completion() {
         ;;
         workspace)
           [[ $CURRENT -gt 2 ]] && \
-          _yarn_workspace_commands && \
-          return # if current == 3 then run commands like useal 'yarn'
+          _yarn_workspace_commands $words[2] && \
+          return
 
           _yarn_get_workspaces
         ;;
