@@ -13,12 +13,14 @@ _yarn_recursively_look_for() {
     dir=${dir%/*}
     [[ "$dir" = "" ]] && break
   done
+
   [[ ! "$dir" = "" ]] && echo "$dir/$filename"
 }
 
 _yarn_get_package_json_property_object() {
   local package_json="$1"
   local property="$2"
+
   cat "$package_json" |
     sed -nE "/^  \"$property\": \{$/,/^  \},?$/p" | # Grab scripts object
     sed '1d;$d' |                                   # Remove first/last lines
@@ -28,11 +30,13 @@ _yarn_get_package_json_property_object() {
 _yarn_get_package_json_property_object_keys() {
   local package_json="$1"
   local property="$2"
+
   _yarn_get_package_json_property_object "$package_json" "$property" | cut -f 1 -d "="
 }
 
 _yarn_parse_package_json_for_script_suggestions() {
   local package_json="$1"
+
   _yarn_get_package_json_property_object "$package_json" scripts |
     sed -E 's/(.+)=>(.+)/\1:$ \2/' |  # Parse commands into suggestions
     sed 's/\(:\)[^$]/\\&/g' |         # Escape ":" in commands
@@ -41,6 +45,7 @@ _yarn_parse_package_json_for_script_suggestions() {
 
 _yarn_parse_package_json_for_deps() {
   local package_json="$1"
+
   _yarn_get_package_json_property_object_keys "$package_json" dependencies
   _yarn_get_package_json_property_object_keys "$package_json" devDependencies
 }
@@ -60,11 +65,12 @@ _yarn_get_scripts_from_package_json() {
 }
 
 _yarn_get_scripts_from_workspace_package_json() {
+  local -a options
+  
   package_json="$(_yarn_recursively_look_for package.json $location)"
 
   [[ "$package_json" = "" ]] && return
 
-  local -a options
   options=(
     ${(f)"$(_yarn_parse_package_json_for_script_suggestions $package_json)"} \
     env:'Prints list of environment variables available to the scripts at runtime' \
@@ -80,6 +86,41 @@ _yarn_get_packages_from_package_json() {
   [[ "$package_json" = "" ]] && return
 
   _values $(_yarn_parse_package_json_for_deps "$package_json")
+}
+
+_yarn_get_packages_from_global_package_json() {
+  local global_dir="$(yarn global dir)"
+  local package_json="$global_dir/package.json"
+
+  # Return if we can't find package.json
+  [[ "$package_json" = "" ]] && return
+
+  _values $(_yarn_parse_package_json_for_deps "$package_json")
+}
+
+_yarn_get_packages_from_workspace_package_json() {
+  local package_json
+
+  package_json="$(_yarn_recursively_look_for package.json $location)"
+
+  # Return if we can't find package.json
+  [[ "$package_json" = "" ]] && return
+
+  _values $(_yarn_parse_package_json_for_deps "$package_json")
+}
+
+_yarn_completion_global_commands() {
+  case $words[2] in
+    add)
+      _values $(_yarn_get_cached_packages) \
+    ;;
+    remove)
+      _yarn_get_packages_from_global_package_json
+    ;;
+    upgrade | uprade-interactive)
+      _yarn_get_packages_from_global_package_json
+    ;;
+  esac
 }
 
 _yarn_get_cached_packages() { # todo: find faster method to get cached packages
@@ -106,12 +147,6 @@ _yarn_get_workspaces() { # add condition if pwd is not yarn workspace
 _yarn_workspace_commands() {
   local location workspace_name package_json 
 
-  case $words[3] in
-      *)
-        [[ $CURRENT == 4 ]] && return # add completions to commands
-      ;;
-  esac
-
   workspace_name="$1"
 
   location="$(
@@ -122,6 +157,131 @@ _yarn_workspace_commands() {
     sed '/",/ s///g' |
     tr -d '[:space:]'
   )"
+
+  case $words[3] in
+    add)
+      _values $(_yarn_get_cached_packages) \
+      && return
+    ;;
+    remove)
+      _yarn_get_packages_from_workspace_package_json \
+      && return
+    ;;
+    upgrade | upgrade-interactive)
+      _yarn_get_packages_from_workspace_package_json \
+      && return
+    ;;
+    run)
+      [[ $CURRENT == 5 ]] && return
+      _yarn_get_scripts_from_workspace_package_json \
+      && return
+    ;;
+    cache)
+      [[ $CURRENT == 3 ]] && return
+      local -a list
+
+      list=(
+        list:'Prints out every cached package'
+        dir:'Prints out the path where yarn’s global cache is currently stored.'
+        clean:'Command will clear the global cache.'
+      )
+
+      _describe -t cache-commands 'cache commands' list \
+      && return
+    ;;
+    config)
+      [[ $CURRENT == 5 ]] && return
+      local -a list
+
+      list=(
+        set:'Sets the config key to a certain value.'
+        get:'Echoes the value for a given key to stdout.'
+        delete:'Deletes a given key from the config.'
+        list:'Displays the current configuration.'
+      )
+
+      _describe -t config-commands 'config commands' list \
+      && return
+    ;;
+    help)
+      [[ $CURRENT == 5 ]] && return
+
+      _alternative \
+        'global-commands:global:_yarn_global_commands' \
+        'common-workspace-commands:workspace:_yarn_common_workspace_commands' \
+      && return
+    ;;
+    info)
+      [[ $CURRENT == 5 ]] && return
+      _values $(_yarn_get_cached_packages) \
+      && return
+    ;;
+    licenses)
+      [[ $CURRENT == 5 ]] && return
+      local -a list
+
+      list=(
+        list:'List licenses for installed packages.'
+        generate-disclaimer:'Running this command will return a sorted list of licenses from all the packages you have installed to the stdout.'
+      )
+
+
+      _describe -t licenses-commands 'licenses commands' list \
+      && return
+    ;;
+    owner)
+      [[ $CURRENT == 5 ]] && return
+      local -a list
+
+      list=(
+        list:'Lists all of the owners of a <package>.'
+        add:'Adds the <user> as an owner of the <package>. You must already be an owner of the <package> in order to run this command.'
+        remove:'Removes the <user> as an owner of the <package>. You must already be an owner of the <package> in order to run this command.'
+      )
+
+      _describe -t owner-commands 'owner commands' list \
+      && return
+    ;;
+    policies)
+      [[ $CURRENT == 5 ]] && return
+      local -a list
+
+      list=(
+        set-version:'Defines project-wide policies for your project.'
+      )
+
+      _describe -t policies-commands 'policies commands' list \
+      && return
+    ;;
+    tab)
+      [[ $CURRENT == 5 ]] && return
+      local -a list
+      
+      list=(
+        add:'Add a tag named <tag> for a specific <version> of a <package>.'
+        remove:'Remove a tag named <tag> from a <package> that is no longer in use.'
+        list:'List all of the tags for a <package>. If unspecified <package> will default to the package you’re currently inside the directory of.'
+      )
+
+      _describe -t tab-commands 'tag commands' list \
+      && return
+    ;;
+    team)
+      [[ $CURRENT == 5 ]] && return
+      local -a list
+
+      list=(
+        create:'Create a new team.'
+        destroy:'Destroys an existing team.'
+        add:'Add a user to an existing team.'
+        remove:'Remove a user from a team they belong to.'
+        list:'If performed on an organization name, will return a list of existing teams under that organization. If performed on a team, it will instead return a list of all users belonging to that particular team.'
+      )
+
+      _describe -t team-commands 'team commands' list \
+      && return
+    ;;
+  esac
 
   _alternative \
     'global-commands:global:_yarn_global_commands' \
@@ -231,6 +391,7 @@ _yarn_common_workspace_commands() {
     outdated:'Checks for outdated package dependencies.'
     owner:'Manage package owners.'
     pack:'Creates a compressed gzip archive of package dependencies.'
+    policies:'Defines project-wide policies for your project.'
     publish:'Publishes a package to the npm registry.'
     run:'Runs a defined package script.'
     tag:'Add, remove, or list tags on a package.'
@@ -314,8 +475,8 @@ _yarn_completion() {
     '--ignore-scripts[don’t run lifecycle scripts]' \
     '--json[format Yarn log messages as lines of JSON]' \
     '--link-duplicates[create hardlinks to the repeated modules in node_modules]' \
-    '--link-folder[specify a custom folder to store global links]' \
-    '--modules-folder[rather than installing modules into the node_modules folder relative to the cwd, output them here]' \
+    '--link-folder[specify a custom folder to store global links]: :_directories' \
+    '--modules-folder[rather than installing modules into the node_modules folder relative to the cwd, output them here]: :_directories' \
     '--mutex[use a mutex to ensure only one yarn instance is executing]' \
     '--network-concurrency[maximum number of concurrent network requests]' \
     '--network-timeout[TCP timeout for network requests]' \
@@ -328,7 +489,7 @@ _yarn_completion() {
     '--offline[trigger an error if any required dependencies are not available in local cache]' \
     '--otp[one-time password for two factor authentication]' \
     '--prefer-offline[use network only if dependencies are not available in local cache]' \
-    '--preferred-cache-folder[specify a custom folder to store the yarn cache if possible]' \
+    '--preferred-cache-folder[specify a custom folder to store the yarn cache if possible]: :_directories' \
     '--prod --production[prod]' \
     '--proxy' \
     '--pure-lockfile[don’t generate a lockfile]' \
@@ -366,7 +527,7 @@ _yarn_completion() {
         'package-scripts:scripts:_yarn_get_scripts_from_package_json' \
     ;;
     arg)
-      if [[ "$words[-1]" == "-" ]]; then
+      if [[ "${words[-1]:0:1}" == "-" ]]; then # options should complete as option is typed
         _yarn_common_flags \
         && return
       fi
@@ -386,6 +547,10 @@ _yarn_completion() {
           _yarn_get_scripts_from_package_json
         ;;
         global)
+          [[ $CURRENT > 2 ]] \
+          && _yarn_completion_global_commands \
+          && return
+
           _alternative \
             'global-strictly-commands:strictly:_yarn_global_strictly_commands' \
             'global-commands:global:_yarn_global_commands' \
@@ -444,7 +609,7 @@ _yarn_completion() {
           [[ $CURRENT == 3 ]] && return
           _values $(_yarn_get_cached_packages)
         ;;
-        licences)
+        licenses)
           [[ $CURRENT == 3 ]] && return
           local -a list
 
@@ -453,8 +618,7 @@ _yarn_completion() {
             generate-disclaimer:'Running this command will return a sorted list of licenses from all the packages you have installed to the stdout.'
           )
 
-
-          _describe -t licences-commands 'licences commands' list
+          _describe -t licenses-commands 'licenses commands' list
         ;;
         owner)
           [[ $CURRENT == 3 ]] && return

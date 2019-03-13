@@ -17,12 +17,12 @@
 - [x] `upgrade` | `upgrade-interactive` will suggest packages from package.json file
 - [x] `workspace` will suggest workspaces names from workspaces info 
 - [x] `workspace` after workspace name will suggest commands and scripts
-- [ ] add completions to `workspace` commands
+- [x] add completions to `workspace` commands
 - [x] `yarn` (empty) will suggest available commands and scripts from package.json
 - [x] `run` will suggest scripts from package.json and [ `env` ]
-- [ ] `global` will suggest [ `add` | `bin` | `dir` | `list` | `remove` | `upgrade` | `upgrade-interactive` ]
+- [x] `global` will suggest [ `add` | `bin` | `dir` | `list` | `remove` | `upgrade` | `upgrade-interactive` ]
 - [x] `workspaces` will suggest [ `run` | `list` ]
-- [ ] `workspaces` run will suggest scripts from package.json files in workspaces
+- [x] `workspaces run` will suggest scripts from package.json files in workspaces
 - [x] `cache` will suggest [ `list` *(—pattern)* | `dir` | `clean` ]
 - [x] `config` suggests [ `set` | `get` | `delete` | `list` ]
 - [ ] `config` `set` | `get` maybe suggest config keys
