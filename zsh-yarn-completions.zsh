@@ -85,7 +85,9 @@ _yarn_get_packages_from_package_json() {
   # Return if we can't find package.json
   [[ "$package_json" = "" ]] && return
 
-  _values $(_yarn_parse_package_json_for_deps "$package_json")
+  _values \
+  'description' \
+  $(_yarn_parse_package_json_for_deps "$package_json")
 }
 
 _yarn_get_packages_from_global_package_json() {
@@ -95,8 +97,9 @@ _yarn_get_packages_from_global_package_json() {
   # Return if we can't find package.json
   [[ "$package_json" = "" ]] && return
 
-  _values $(_yarn_parse_package_json_for_deps "$package_json")
-}
+  _values \
+  'description' \
+  $(_yarn_parse_package_json_for_deps "$package_json")}
 
 _yarn_get_packages_from_workspace_package_json() {
   local package_json
@@ -449,7 +452,7 @@ _yarn_common_commands() {
 
 _yarn_completion() {
   local curcontext="$curcontext" state state_descr line
-  typeset -A opt_args
+  typeset -A opt_args val_args
   local -a orig_words
   local package_json="$(_yarn_recursively_look_for package.json)"
 
@@ -506,19 +509,6 @@ _yarn_completion() {
 		'(-): :->command' \
 		'(-)*:: :->arg'
 
-  # echo
-  # echo state: $state
-  # echo curcontext: $curcontext
-  # echo descr: $state_descr
-  # echo line: $line
-  # echo arg: $0, $1, $2, $3
-  # echo words: $words $words[1]
-  # echo opt_args: $opt_args
-  # echo service $service
-  # echo CURRENT $CURRENT
-  # echo last word: $words[-1]
-  # echo
-
   case $state in
     command)
       _alternative \
@@ -538,9 +528,11 @@ _yarn_completion() {
         ;;
         remove)
           _yarn_get_packages_from_package_json \
+          && return
         ;;
         upgrade | upgrade-interactive)
           _yarn_get_packages_from_package_json \
+          && return
         ;;
         run)
           [[ $CURRENT == 3 ]] && return
