@@ -386,7 +386,9 @@ _yarn_completion() {
           _yarn_get_scripts_from_package_json
         ;;
         global)
-          echo global
+          _alternative \
+            'global-strictly-commands:strictly:_yarn_global_strictly_commands' \
+            'global-commands:global:_yarn_global_commands' \
         ;;
         workspaces)
           [[ $CURRENT == 3 ]] && return
@@ -405,6 +407,102 @@ _yarn_completion() {
           return
 
           _yarn_get_workspaces
+        ;;
+        cache)
+          [[ $CURRENT == 3 ]] && return
+          local -a list
+
+          list=(
+            list:'Prints out every cached package'
+            dir:'Prints out the path where yarn’s global cache is currently stored.'
+            clean:'Command will clear the global cache.'
+          )
+
+          _describe -t cache-commands 'cache commands' list
+        ;;
+        config)
+          [[ $CURRENT == 3 ]] && return
+          local -a list
+
+          list=(
+            set:'Sets the config key to a certain value.'
+            get:'Echoes the value for a given key to stdout.'
+            delete:'Deletes a given key from the config.'
+            list:'Displays the current configuration.'
+          )
+
+          _describe -t config-commands 'config commands' list
+        ;;
+        help)
+          [[ $CURRENT == 3 ]] && return
+
+          _alternative \
+            'global-commands:global:_yarn_global_commands' \
+            'common-commands:common:_yarn_common_commands' \
+        ;;
+        info)
+          [[ $CURRENT == 3 ]] && return
+          _values $(_yarn_get_cached_packages)
+        ;;
+        licences)
+          [[ $CURRENT == 3 ]] && return
+          local -a list
+
+          list=(
+            list:'List licenses for installed packages.'
+            generate-disclaimer:'Running this command will return a sorted list of licenses from all the packages you have installed to the stdout.'
+          )
+
+
+          _describe -t licences-commands 'licences commands' list
+        ;;
+        owner)
+          [[ $CURRENT == 3 ]] && return
+          local -a list
+
+          list=(
+            list:'Lists all of the owners of a <package>.'
+            add:'Adds the <user> as an owner of the <package>. You must already be an owner of the <package> in order to run this command.'
+            remove:'Removes the <user> as an owner of the <package>. You must already be an owner of the <package> in order to run this command.'
+          )
+
+          _describe -t owner-commands 'owner commands' list
+        ;;
+        policies)
+          [[ $CURRENT == 3 ]] && return
+          local -a list
+
+          list=(
+            set-version:'Defines project-wide policies for your project.'
+          )
+
+          _describe -t policies-commands 'policies commands' list
+        ;;
+        tab)
+          [[ $CURRENT == 3 ]] && return
+          local -a list
+          
+          list=(
+            add:'Add a tag named <tag> for a specific <version> of a <package>.'
+            remove:'Remove a tag named <tag> from a <package> that is no longer in use.'
+            list:'List all of the tags for a <package>. If unspecified <package> will default to the package you’re currently inside the directory of.'
+          )
+
+          _describe -t tab-commands 'tag commands' list
+        ;;
+        team)
+          [[ $CURRENT == 3 ]] && return
+          local -a list
+
+          list=(
+            create:'Create a new team.'
+            destroy:'Destroys an existing team.'
+            add:'Add a user to an existing team.'
+            remove:'Remove a user from a team they belong to.'
+            list:'If performed on an organization name, will return a list of existing teams under that organization. If performed on a team, it will instead return a list of all users belonging to that particular team.'
+          )
+
+          _describe -t team-commands 'team commands' list
         ;;
       esac
     ;;

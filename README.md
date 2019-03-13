@@ -2,7 +2,7 @@
 > Yarn completions for Z-shell that supports `yarn workspaces`
 
 ## What is does?
-- Right now not much 😅
+- You can look progress at the roadmap 😅
 
 ## Requirements:
   - [zsh](https://github.com/zsh-users/zsh) - `Z-shell`
@@ -23,16 +23,16 @@
 - [ ] `global` will suggest [ `add` | `bin` | `dir` | `list` | `remove` | `upgrade` | `upgrade-interactive` ]
 - [x] `workspaces` will suggest [ `run` | `list` ]
 - [ ] `workspaces` run will suggest scripts from package.json files in workspaces
-- [ ] `cache` will suggest [ `list` *(—pattern)* | `dir` | `clean` ]
-- [ ] `config` suggests [ `set` | `get` | `delete` | `list` ]
+- [x] `cache` will suggest [ `list` *(—pattern)* | `dir` | `clean` ]
+- [x] `config` suggests [ `set` | `get` | `delete` | `list` ]
 - [ ] `config` `set` | `get` maybe suggest config keys
-- [ ] `help` suggests all commands excepts global strictly
-- [ ] `info` suggests packages from cache
-- [ ] `licences` suggests [ `list` | `generate-disclaimer` ]
-- [ ] `owner` suggests [ `list` | `add` | `remove` ]
-- [ ] `policies` suggests [ `set-version` ]
-- [ ] `tag` suggests [ `add` | `remove` | `list` ]
-- [ ] `team` suggests [ `create` | `destroy` | `add` | `remove` | `list` ]
+- [x] `help` suggests all commands excepts global strictly
+- [x] `info` suggests packages from cache
+- [x] `licences` suggests [ `list` | `generate-disclaimer` ]
+- [x] `owner` suggests [ `list` | `add` | `remove` ]
+- [x] `policies` suggests [ `set-version` ]
+- [x] `tag` suggests [ `add` | `remove` | `list` ]
+- [x] `team` suggests [ `create` | `destroy` | `add` | `remove` | `list` ]
  
 ## Contribution
 > Any contribution are welcome
