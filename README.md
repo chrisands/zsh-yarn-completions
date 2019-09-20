@@ -18,32 +18,32 @@
 
 ### Using [Antigen](https://github.com/zsh-users/antigen)
 ```
-antigen bundle chrisands/zsh-yarn-completion
+antigen bundle chrisands/zsh-yarn-completions
 ```
 
 ### Using [zplug](https://github.com/zplug/zplug)
 ```
-zplug "chrisands/zsh-yarn-completion", defer:2
+zplug "chrisands/zsh-yarn-completions", defer:2
 ```
 
 ### Using [Oh My Zsh!](https://github.com/robbyrussell/oh-my-zsh) as custom plugin
 Clone zsh-yarn-completion into your custom plugins repo
 ```
-git clone https://github.com/chrisands/zsh-yarn-completion ~/.oh-my-zsh/custom/plugins/zsh-yarn-completion
+git clone https://github.com/chrisands/zsh-yarn-completions ~/.oh-my-zsh/custom/plugins/zsh-yarn-completions
 ```
 Then load as a plugin in your .zshrc
 ```
-plugins+=(zsh-yarn-completion)
+plugins+=(zsh-yarn-completions)
 ```
 
 ### Manually
 Clone this repository somewhere (~/.zsh-yarn-completion for example)
 ```
-git clone https://github.com/chrisands/zsh-yarn-completion.git ~/.zsh-yarn-completion
+git clone https://github.com/chrisands/zsh-yarn-completions.git ~/.zsh-yarn-completions
 ```
 Then source it in your .zshrc
 ```
-source ~/.zsh-yarn-completion/zsh-yarn-completion.plugin.zsh
+source ~/.zsh-yarn-completion/zsh-yarn-completions.plugin.zsh
 ```
 
 ## Roadmap
