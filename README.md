@@ -43,7 +43,7 @@ git clone https://github.com/chrisands/zsh-yarn-completions.git ~/.zsh-yarn-comp
 ```
 Then source it in your .zshrc
 ```
-source ~/.zsh-yarn-completion/zsh-yarn-completions.plugin.zsh
+source ~/.zsh-yarn-completions/zsh-yarn-completions.plugin.zsh
 ```
 
 ## Roadmap
@@ -51,7 +51,9 @@ source ~/.zsh-yarn-completion/zsh-yarn-completions.plugin.zsh
 - [ ] `config` `set` | `get` suggest config keys (?)
 - [ ] `add` find faster way to fetch from cache
 - [ ] replace `jq` with native tools
- 
+- [ ] add error validation
+- [ ] add aliases 
+
 ## Contribution
 Any contribution are welcome!
 ## License
