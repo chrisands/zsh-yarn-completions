@@ -46,13 +46,28 @@ Then source it in your .zshrc
 source ~/.zsh-yarn-completions/zsh-yarn-completions.plugin.zsh
 ```
 
+### Aliases
+| Alias | Command                |
+| ----- | ---------------------- |
+| `y`   | `yarn`                 |
+| `yi`  | `yarn install`         |
+| `ya`  | `yarn add`             |
+| `yad` | `yarn add -D`          |
+| `yga` | `yarn global add`      |
+| `yr`  | `yarn remove`          |
+| `ygr` | `yarn global remove`   |
+| `yl`  | `yarn link`            |
+| `yu`  | `yarn unlink`          |
+| `yw`  | `yarn workspace`       |
+| `ywi` | `yarn workspaces info` |
+
 ## Roadmap
 - [ ] suggest unique flags for different commands
 - [ ] `config` `set` | `get` suggest config keys (?)
 - [ ] `add` find faster way to fetch from cache
 - [ ] replace `jq` with native tools
 - [ ] add error validation
-- [ ] add aliases 
+- [x] add aliases 
 
 ## Contribution
 Any contribution are welcome!

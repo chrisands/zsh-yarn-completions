@@ -1,3 +1,15 @@
+alias y="yarn"
+alias yi="yarn install"
+alias ya="yarn add"
+alias yad="yarn add -D"
+alias yga="yarn global add"
+alias yr="yarn remove"
+alias ygr="yarn global remove"
+alias yl="yarn link"
+alias yu="yarn unlink"
+alias yw="yarn workspace"
+alias ywi="yarn workspaces info"
+
 _yarn_recursively_look_for() {
   local dir
   local filename="$1"
