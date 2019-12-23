@@ -12,7 +12,7 @@
 
 ## Requirements:
   - [zsh](https://github.com/zsh-users/zsh) - `Z-shell`
-  - [jq](https://stedolan.github.io/jq/) - `JSON processor`
+  - <del>[jq](https://stedolan.github.io/jq/) - `JSON processor`</del> 
 
 ## Installation
 
@@ -65,7 +65,7 @@ source ~/.zsh-yarn-completions/zsh-yarn-completions.plugin.zsh
 - [ ] suggest unique flags for different commands
 - [ ] `config` `set` | `get` suggest config keys (?)
 - [ ] `add` find faster way to fetch from cache
-- [ ] replace `jq` with native tools
+- [x] replace `jq` with native tools
 - [ ] add error validation
 - [x] add aliases 
 

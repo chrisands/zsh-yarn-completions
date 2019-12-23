@@ -153,10 +153,9 @@ _yarn_get_workspaces() { # add condition if pwd is not yarn workspace
   local -a workspaces
 
   for workspace in $(
-    yarn workspaces info |
-    sed '1d;$d' |
-    jq keys |
-    jq -r '.[]'
+    yarn workspaces info | # return json object
+    sed -nE '/".+": {/p' | # filters object keys
+    sed -e 's/^[ "]*//' -e 's/\(": {\)*$//' # removes unnecessary symbols
   ); do
     workspaces+=($workspace)
   done
