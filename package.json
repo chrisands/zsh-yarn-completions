@@ -1,7 +1,0 @@
-{
-  "name": "zsh-yarn-completions",
-  "version": "0.0.0",
-  "main": "index.js",
-  "author": "Andrey Osijuk <a.osijuk@gmail.com>",
-  "license": "MIT"
-}
