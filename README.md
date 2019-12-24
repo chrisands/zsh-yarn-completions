@@ -12,7 +12,6 @@
 
 ## Requirements:
   - [zsh](https://github.com/zsh-users/zsh) - `Z-shell`
-  - <del>[jq](https://stedolan.github.io/jq/) - `JSON processor`</del>
 
 ## Installation
 
