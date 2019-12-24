@@ -151,16 +151,24 @@ _yarn_get_cached_packages() { # todo: find faster method to get cached packages
 
 _yarn_get_workspaces() { # add condition if pwd is not yarn workspace
   local -a workspaces
+  local object
 
-  for workspace in $(
-    yarn workspaces info | # return json object
-    sed -nE '/".+": {/p' | # filters object keys
-    sed -e 's/^[ "]*//' -e 's/\(": {\)*$//' # removes unnecessary symbols
-  ); do
-    workspaces+=($workspace)
-  done
+  object="$(
+    yarn workspaces info || # return json object
+    echo 'error' # print an error to variable
+  )"
 
-  _describe -t workspace-names "workspaces names" workspaces
+  if [[ ! $object =~ 'error' ]]; then
+    for workspace in $(
+      echo $object | # print object
+      sed -nE '/".+": {/p' | # filters object keys
+      sed -e 's/^[ "]*//' -e 's/\(": {\)*$//' || # removes unnecessary symbols
+    ); do
+      workspaces+=($workspace)
+    done
+
+    _describe -t workspace-names "workspaces names" workspaces
+  fi
 }
 
 _yarn_workspace_commands() {

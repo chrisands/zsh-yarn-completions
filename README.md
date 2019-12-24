@@ -12,7 +12,7 @@
 
 ## Requirements:
   - [zsh](https://github.com/zsh-users/zsh) - `Z-shell`
-  - <del>[jq](https://stedolan.github.io/jq/) - `JSON processor`</del> 
+  - <del>[jq](https://stedolan.github.io/jq/) - `JSON processor`</del>
 
 ## Installation
 
@@ -66,13 +66,13 @@ source ~/.zsh-yarn-completions/zsh-yarn-completions.plugin.zsh
 - [ ] `config` `set` | `get` suggest config keys (?)
 - [ ] `add` find faster way to fetch from cache
 - [x] replace `jq` with native tools
-- [ ] add error validation
-- [x] add aliases 
+- [x] add error validation
+- [x] add aliases
 
 ## Contribution
 Any contribution are welcome!
 ## License
 [MIT](/LICENSE)
 
-## Acknowledgments 
+## Acknowledgments
 [zsh-better-npm-completion](https://github.com/lukechilds/zsh-better-npm-completion) — used few function from project and helped understand how to write proper autocompletion system for zsh.
