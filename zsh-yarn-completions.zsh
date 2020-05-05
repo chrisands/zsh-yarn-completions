@@ -165,7 +165,7 @@ _yarn_get_workspaces() { # add condition if pwd is not yarn workspace
     # the second sed command removes quotes, spaces, colon, and brace
     for workspace in $(
       echo $object |
-      sed -nE '/".+": {/p' |
+      sed -nE '/".+": \{/p' |
       sed -e 's/^[ "]*//' -e 's/\(": {\)*$//' ||
     ); do
       workspaces+=($workspace)
