@@ -153,16 +153,20 @@ _yarn_get_workspaces() { # add condition if pwd is not yarn workspace
   local -a workspaces
   local object
 
+  # get workspace metadata as json object or assign string 'error' to variable
+  # `object`
   object="$(
-    yarn workspaces info || # return json object
-    echo 'error' # print an error to variable
+    yarn workspaces info ||
+    echo 'error'
   )"
 
   if [[ ! $object =~ 'error' ]]; then
+    # the first sed command extracts workspace name keys from the json input;
+    # the second sed command removes quotes, spaces, colon, and brace
     for workspace in $(
-      echo $object | # print object
-      sed -nE '/".+": {/p' | # filters object keys
-      sed -e 's/^[ "]*//' -e 's/\(": {\)*$//' || # removes unnecessary symbols
+      echo $object |
+      sed -nE '/".+": \{/p' |
+      sed -e 's/^[ "]*//' -e 's/\(": {\)*$//' ||
     ); do
       workspaces+=($workspace)
     done
