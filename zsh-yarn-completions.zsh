@@ -181,12 +181,11 @@ _yarn_workspace_commands() {
   workspace_name="$1"
 
   location="$(
-    yarn workspaces info |
-    grep $workspace_name -A 1 |
-    sed '1d' |
-    sed '/"location": "/ s///g' |
-    sed '/",/ s///g' |
-    tr -d '[:space:]'
+    yarn workspaces info --json |
+    sed -nE "/^  \"$workspace_name\": \{$/,/^  \},?$/p" |
+    sed '1d;$d' |
+    grep "location" |
+    sed 's/.*: "\(.*\)",/\1/'
   )"
 
   case $words[3] in
