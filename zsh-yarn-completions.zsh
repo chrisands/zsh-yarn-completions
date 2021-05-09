@@ -33,10 +33,14 @@ _yarn_get_package_json_property_object() {
   local package_json="$1"
   local property="$2"
 
+  # cat command prints package.json file
+  # first sed command grabs scripts object
+  # second sed command removes first & last lines
+  # third sed command parses into key=>value
   cat "$package_json" |
-    sed -nE "/^  \"$property\": \{$/,/^  \},?$/p" | # Grab scripts object
-    sed '1d;$d' |                                   # Remove first/last lines
-    sed -E 's/    "([^"]+)": "(.+)",?/\1=>\2/'      # Parse into key=>value
+    sed -nE "/^  \"$property\": \{$/,/^  \},?$/p" |
+    sed '1d;$d' |
+    sed -E 's/    "([^"]+)": "(.+)",?/\1=>\2/'
 }
 
 _yarn_get_package_json_property_object_keys() {
@@ -49,10 +53,13 @@ _yarn_get_package_json_property_object_keys() {
 _yarn_parse_package_json_for_script_suggestions() {
   local package_json="$1"
 
+  # first sed command parses commands info suggestions
+  # second sed command escapes ":" in commands
+  # third sed command escapes ":$" without a space in commands
   _yarn_get_package_json_property_object "$package_json" scripts |
-    sed -E 's/(.+)=>(.+)/\1:$ \2/' |  # Parse commands into suggestions
-    sed 's/\(:\)[^$]/\\&/g' |         # Escape ":" in commands
-    sed 's/\(:\)$[^ ]/\\&/g'          # Escape ":$" without a space in commands
+    sed -E 's/(.+)=>(.+)/\1:$ \2/' |
+    sed 's/\(:\)[^$]/\\&/g' |
+    sed 's/\(:\)$[^ ]/\\&/g'
 }
 
 _yarn_parse_package_json_for_deps() {
