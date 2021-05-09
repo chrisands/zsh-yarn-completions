@@ -85,7 +85,7 @@ _yarn_get_scripts_from_workspace_package_json() {
   [[ "$package_json" = "" ]] && return
 
   options=(
-    ${(f)$(_yarn_parse_package_json_for_script_suggestions $package_json)} \
+    ${(f)"$(_yarn_parse_package_json_for_script_suggestions $package_json)"} \
     env:"Prints list of environment variables available to the scripts at runtime" \
   )
 
