@@ -85,7 +85,7 @@ _yarn_get_scripts_from_workspace_package_json() {
   [[ "$package_json" = "" ]] && return
 
   options=(
-    ${(f)$(_yarn_parse_package_json_for_script_suggestions $package_json)} \
+    ${(f)"$(_yarn_parse_package_json_for_script_suggestions $package_json)"} \
     env:"Prints list of environment variables available to the scripts at runtime" \
   )
 
@@ -317,7 +317,7 @@ _yarn_workspace_commands() {
   _alternative \
     "global-commands:global:_yarn_global_commands" \
     "common-workspace-commands:workspace:_yarn_common_workspace_commands" \
-    "package-scripts:scripts:_yarn_get_scripts_from_workspace_package_json" \;
+    "package-scripts:scripts:_yarn_get_scripts_from_workspace_package_json"\;
 }
 
 _yarn_common_flags() {
