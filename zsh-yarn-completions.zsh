@@ -185,7 +185,7 @@ _yarn_get_workspaces() { # add condition if pwd is not yarn workspace
 _yarn_workspace_commands() {
   local location workspace_name package_json
 
-  workspace_name="$1"
+  workspace_name="$(echo $1 | sed 's/\(\/\)[^$]/\\&/g')"
 
   location="$(
     yarn workspaces info --json |
