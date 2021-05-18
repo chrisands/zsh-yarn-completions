@@ -38,9 +38,9 @@ _yarn_get_package_json_property_object() {
   # second sed command removes first & last lines
   # third sed command parses into key=>value
   cat "$package_json" |
-    sed -nE "/^  \"$property\": \{$/,/^  \},?$/p" |
+    sed -nE "/^[  ]+\"$property\": \{$/,/^[  ]+\},?$/p" |
     sed '1d;$d' |
-    sed -E 's/    "([^"]+)": "(.+)",?/\1=>\2/'
+    sed -E 's/[  ]+"([^"]+)": "(.+)",?/\1=>\2/'
 }
 
 _yarn_get_package_json_property_object_keys() {
@@ -189,7 +189,7 @@ _yarn_workspace_commands() {
 
   location="$(
     yarn workspaces info --json |
-    sed -nE "/^  \"$workspace_name\": \{$/,/^  \},?$/p" |
+    sed -nE "/^[  ]+\"$workspace_name\": \{$/,/^[   ]+\},?$/p" |
     sed '1d;$d' |
     grep "location" |
     sed 's/.*: "\(.*\)",/\1/'
